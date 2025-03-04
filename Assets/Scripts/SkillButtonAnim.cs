@@ -45,10 +45,10 @@ public class SkillButtonAnim : MonoBehaviour
 
     private float GetAngleFromPosition(Vector2 pos)
     {
-        Debug.LogWarning(pos + " "+Mathf.Atan2(pos.x, pos.y) * Mathf.Rad2Deg);
+        Debug.LogWarning(pos + " " + Mathf.Atan2(pos.x, pos.y) * Mathf.Rad2Deg);
         return Mathf.Atan2(pos.x, pos.y) * Mathf.Rad2Deg;
     }
-    
+
     private Vector2 ElementScale(Transform t)
     {
         float angle = GetAngleFromPosition(t.localPosition);
@@ -57,13 +57,13 @@ public class SkillButtonAnim : MonoBehaviour
         {
             0f => 1.35f,
             45f => 1.2f,
-            >45f => 1f,
+            > 45f => 1f,
             _ => 1f
         };
         return new Vector2(scale, scale);
     }
 
-    
+
     [ContextMenu("Arrange")]
     public void Animate()
     {
@@ -131,6 +131,7 @@ public class SkillButtonAnim : MonoBehaviour
     }
 
     public void ScrollElement(Element element) => StartCoroutine(ElementScroll(element));
+
     private IEnumerator ElementScroll(Element element)
     {
         yield return null;
@@ -141,25 +142,27 @@ public class SkillButtonAnim : MonoBehaviour
         float difference = Mathf.Abs(angle + 90f);
         int steps = Mathf.RoundToInt(difference / 45f);
         print(steps);
-        
+
         float[] startAngle = new float[elements.Count];
         for (int i = 0; i < elements.Count; i++)
         {
             startAngle[i] = GetAngleFromPosition(elements[i].transform.localPosition);
+            startAngle[i] = startAngle[i] > 0 ? -startAngle[i] : startAngle[i];
             print($"{elements[i].name} startAngle: {startAngle[i]}");
         }
-        
+
         float[] targetAngle = new float[elements.Count];
+        int dirtyIndex = 0;
         for (int i = 0; i < elements.Count; i++)
         {
             targetAngle[i] = startAngle[i] + (angleDelta * direction);
             print($"{elements[i].name} targetAngle: {targetAngle[i]}");
             if (targetAngle[i] < -180f)
             {
+                dirtyIndex = i;
                 print(targetAngle[i]);
-                targetAngle[i] = -359f;
+                targetAngle[i] = -359.9f;
                 print(targetAngle[i]);
-
             }
             else if (targetAngle[i] > 0f)
             {
@@ -180,8 +183,16 @@ public class SkillButtonAnim : MonoBehaviour
                 Vector2 pos = new Vector2(radius * Mathf.Sin(radians), radius * Mathf.Cos(radians));
                 elements[i].localPosition = pos;
             }
-            
+
             yield return null;
         }
+        float dirtyAngle = GetAngleFromPosition(elements[dirtyIndex].transform.localPosition);
+        if (dirtyAngle > 0f)
+        {
+            float radians = 0f;
+            Vector2 pos = new Vector2(radius * Mathf.Sin(radians), radius * Mathf.Cos(radians));
+            elements[dirtyIndex].localPosition = pos;
+        }
+        
     }
 }
