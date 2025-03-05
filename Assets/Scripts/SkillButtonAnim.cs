@@ -43,11 +43,7 @@ public class SkillButtonAnim : MonoBehaviour
         return angles;
     }
 
-    private float GetAngleFromPosition(Vector2 pos)
-    {
-        Debug.LogWarning(pos + " " + Mathf.Atan2(pos.x, pos.y) * Mathf.Rad2Deg);
-        return Mathf.Atan2(pos.x, pos.y) * Mathf.Rad2Deg;
-    }
+    private float GetAngleFromPosition(Vector2 pos) => Mathf.Atan2(pos.x, pos.y) * Mathf.Rad2Deg;
 
     private Vector2 ElementScale(Transform t)
     {
@@ -157,11 +153,12 @@ public class SkillButtonAnim : MonoBehaviour
         {
             targetAngle[i] = startAngle[i] + (angleDelta * direction);
             print($"{elements[i].name} targetAngle: {targetAngle[i]}");
+            print(targetAngle[i] + " "+(targetAngle[i] < -180f));
             if (targetAngle[i] < -180f)
             {
                 dirtyIndex = i;
                 print(targetAngle[i]);
-                targetAngle[i] = -359.9f;
+                targetAngle[i] = -359f;
                 print(targetAngle[i]);
             }
             else if (targetAngle[i] > 0f)
@@ -186,6 +183,7 @@ public class SkillButtonAnim : MonoBehaviour
 
             yield return null;
         }
+        
         float dirtyAngle = GetAngleFromPosition(elements[dirtyIndex].transform.localPosition);
         if (dirtyAngle > 0f)
         {
