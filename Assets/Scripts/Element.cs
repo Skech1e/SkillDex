@@ -7,8 +7,8 @@ public class Element : MonoBehaviour
 {
     public string elementName => this.name;
     public Image img;
-    private Button button;
-    [SerializeField] private SkillButtonAnim skillButtonAnim;
+    public Button button;
+    [SerializeField] private SkillUIAnimator skillUIAnimator;
     private void Awake()
     {
         img = GetComponent<Image>();
@@ -17,7 +17,8 @@ public class Element : MonoBehaviour
 
     private void OnEnable()
     {
-        button.onClick.AddListener(() => skillButtonAnim.ScrollElement(this));
+        img.material = Instantiate(img.material);
+        button.onClick.AddListener(() => skillUIAnimator.ScrollElement(this));
     }
 
     private void OnDisable()
