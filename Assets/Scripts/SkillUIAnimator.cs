@@ -19,7 +19,8 @@ public class SkillUIAnimator : MonoBehaviour
     public Vector2 skillMenuDefaultPos, skillMenuTargetPos = Vector2.zero;
     public float skillBtnAnimSpeed, elementAnimSpeed, skillMenuAnimSpeed;
     public TextMeshProUGUI skillMenuTitle;
-
+    public Image skillMenuBG;
+    
     private void Start()
     {
         defaultPos = transform.localPosition;
@@ -79,7 +80,7 @@ public class SkillUIAnimator : MonoBehaviour
         Vector2 targetPos = SkillMenuActive ? targetPosition : defaultPos;
         float startScale = transform.localScale.x;
         float finalScale = SkillMenuActive ? targetScale : 1f;
-        
+        StartCoroutine(SkillMenuBGFade(SkillMenuActive));
         yield return StartCoroutine(UpdatePositionAndScale(transform, startPos, targetPos, skillBtnAnimSpeed, startScale, finalScale));
         
         if(SkillMenuActive) StartCoroutine(AnimateSkillMenu(SkillMenuActive));
@@ -103,11 +104,33 @@ public class SkillUIAnimator : MonoBehaviour
                 float scale = Mathf.Lerp(startScale, finalScale, t);
                 transform.localScale = new Vector3(scale, scale, scale);
             }
-
+            
             yield return null;
         }
     }
 
+    private IEnumerator SkillMenuBGFade(bool enabled)
+    {
+        if(enabled) skillMenuBG.gameObject.SetActive(true);
+        Color currentColor = skillMenuBG.color;
+        float startVal = currentColor.a;
+        float targetVal = enabled ? 0.69f : 0f;
+        
+        float timer = 0;
+        float startTime = Time.unscaledTime;
+        while (timer < skillMenuAnimSpeed)
+        {
+            timer = Time.unscaledTime - startTime;
+            float t = Mathf.Clamp01(timer / skillMenuAnimSpeed);
+            t = Mathf.SmoothStep(0, 1, t);
+            float val = Mathf.Lerp(startVal, targetVal, t);
+            currentColor.a = val;
+            skillMenuBG.color = currentColor;
+            yield return null;
+        }
+        skillMenuBG.gameObject.SetActive(enabled);
+    }
+    
     private IEnumerator AnimateSkillMenu(bool enabled)
     {
         Vector2 startPos = SkillMenuTransform.localPosition;
